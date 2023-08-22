@@ -35,20 +35,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 
 ## Steps we will try to take 
-1 DB SETUP  + Design 
-2 Next-auth
-3 Api Design 
-4 Blogs Api  Upload image
-5 Frontend
-6 Homepage
-7 Blogs Page
-8 RichText Editor
-9 View Page 
-10 Profile Page
-11 Edit + Delete Functionality 
-12 Search Page Functionality
-13 Login + Signup pages
-14 Optimization 
+1. DB SETUP  + Design
+2. Next-auth
+3. Api Design 
+4. Blogs Api  Upload image
+5. Frontend
+6. Homepage
+7. Blogs Page
+8. RichText Editor
+9. View Page 
+10. Profile Page
+11. Edit + Delete Functionality 
+12. Search Page Functionality
+13. Login + Signup pages
+14. Optimization 
 
 
 ## 1 DB SETUP  + Design 
