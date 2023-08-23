@@ -397,12 +397,194 @@ Try going to page.tsx and enter this code
 Note you should see session data on the screen 
 note the expires is one month from now
 
+
+
+## 3 Api Design 
+
+
+#  User API
+
+In Api create a Users folder, here we will  create our user api routes
+then create a file call it route.ts
+
+GET ALL USERS  
+
+Code: 
+    import { connectToDb } from "@/lib/helpers"
+    import prisma from "@/prisma"
+    import { NextResponse } from "next/server"
+
+    export const GET = async () => {
+      try {
+        await connectToDb()
+        const users = await prisma.user.findMany()
+
+        return NextResponse.json({ message: 'Success', users }, { status: 200 })
+      } catch (error) {
+        return NextResponse.json({ message: 'Error', error }, { status: 500 })
+      } finally {
+        await prisma.$disconnect()
+      }
+    }
+
+Note can test it in postman or by going to
+ http://localhost:3000/api/users
+
+In users create a new folder call it [id] and inside it a file route.ts
+
+GET SINGLE USER
+
+ Code 
+    import { connectToDb } from "@/lib/helpers"
+    import prisma from "@/prisma"
+    import { NextResponse } from "next/server"
+
+    export const GET = async (req: Request, { params }: { params: { id: string } }) => {
+
+
+      if (!params?.id) return
+      try {
+        await connectToDb()
+        const user = await prisma.user.findFirst({
+          where: { id: params.id },
+          include: { blogs: true, _count: true }
+        })
+
+
+        return NextResponse.json({ message: 'Success', user }, { status: 200 })
+      } catch (error) {
+        return NextResponse.json({ message: 'Error', error }, { status: 500 })
+      } finally {
+        await prisma.$disconnect()
+      }
+    }
+
+
+Note can test it in postman or by going to
+ http://localhost:3000/api/users/{user-id-here}
+
+
+
+# Create functions to  stop using nextResponse 
+in Lib  on the helpers  folder create this 2 functions 
+
+    export const genereateSucessMessage = (data: any, status: number) => {
+      return NextResponse.json({ message: 'success', data }, { status, statusText: 'OK' })
+    }
+
+    export const generateErrorMessage = (data: any, status: number) => {
+      return NextResponse.json({ message: 'Error', data }, { status, statusText: 'ERROR' })
+    }
+
+
+
+
+#  Categories Api
+
+
+  In Api create a categories folder, here we will  create our categories api routes
+  then create a file call it route.ts
+
+  GET ALL CATEGORIES  
+
+  
+      import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+      import prisma from "@/prisma"
+      import { NextResponse } from "next/server"
+
+        export const GET = async () => {
+          try {
+            await connectToDb()
+            const categories = await prisma.category.findMany()
+
+            return genereateSucessMessage(categories, 200)
+
+          } catch (error) {
+            
+            return generateErrorMessage(error, 500)
+
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+
+
+  CREATE CATEGORY
+
+
+        export const POST = async (req: Request) => {
+
+          const { name } = await req.json()
+
+          try {
+            await connectToDb()
+            const category = await prisma.category.create({ data: { name } })
+
+            return genereateSucessMessage({ category }, 200)
+          } catch (error) {
+            return generateErrorMessage({ error }, 500)
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+
+  Note can go to Postman and attempt to create category
+  Note : since in categories schema we use an ENUM we can only accept this names:
+   art, education, science, politics
+
+
+Now You can test on  Postman , test create and  view all categories
+
+
+
+
+  CREATE GET SINGLE 
+
+  in  categories folder inside api , crate a  [id] folder and inside a route.tsx file then  enter this code  to get single cateegory base on id
+
+
+          import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+          import prisma from "@/prisma"
+          import { NextResponse } from "next/server"
+
+          export const GET = async (req: Request, { params }: { params: { id: string } }) => {
+
+
+            if (!params?.id) return
+            try {
+              await connectToDb()
+              const category = await prisma.category.findFirst({
+                where: { id: params.id },
+                include: { _count: true,  blogs: true, }
+              })
+
+              return genereateSucessMessage(category, 200)
+
+            } catch (error) {
+
+              return generateErrorMessage(error, 500)
+
+            } finally {
+              await prisma.$disconnect()
+            }
+          }
+
+
+
+    Note:    Now You can test on  Postman 
+
+
+    
+
+
 ## Next Steps -----------------------------------------------   >>> 
 ## Next Steps -----------------------------------------------   >>> 
 ## Next Steps -----------------------------------------------   >>> 
   
 
-## 3 Api Design 
+
 ## 4 Blogs Api  Upload image
 ## 5 Frontend
 ## 6 Homepage
