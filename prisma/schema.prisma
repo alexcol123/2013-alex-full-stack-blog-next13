@@ -23,7 +23,7 @@ model Blog {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
-  imageUrl    String
+  imageUrl    String?
 
   User        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String?  @db.ObjectId

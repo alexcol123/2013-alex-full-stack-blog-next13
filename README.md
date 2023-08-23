@@ -576,7 +576,250 @@ Now You can test on  Postman , test create and  view all categories
     Note:    Now You can test on  Postman 
 
 
-    
+
+
+
+
+## 4 Blogs Api  + Upload image
+
+
+
+# Cloudinary Setup 
+
+    To be able to upload images we need to go to cloudiary and get
+
+    1. Install cludinary 
+        command  = npm i cloudinary
+
+    2. then on    https://cloudinary.com/
+      you need to create account and then get all this info: 
+
+          CLOUDINARY_CLOUD_NAME=(add-here)
+          CLOUDINARY_API_KEY=(add-here)
+          CLOUDINARY_API_SECRET=(add-here)
+
+    3. Add all this to .env
+
+
+
+
+
+# GET ALL BLOGS
+
+ In Api create a blogs folder, here we will  create our blogs api routes
+  then create a file call it route.ts
+
+
+    import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+    import prisma from "@/prisma"
+    import { NextResponse } from "next/server"
+
+    export const GET = async () => {
+      try {
+        await connectToDb()
+        const blogs = await prisma.blog.findMany()
+
+
+        return genereateSucessMessage(blogs, 200)
+      } catch (error) {
+        return generateErrorMessage(error, 500)
+
+      } finally {
+        await prisma.$disconnect()
+      }
+    }
+
+
+# Create a Blog 
+      import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+      import prisma from "@/prisma"
+      import { v2, UploadApiResponse } from 'cloudinary'
+
+
+
+
+      async function uploadImage(file: Blob) {
+        return new Promise<UploadApiResponse>(async (resolve, reject) => {
+
+          const buffer = Buffer.from(await file.arrayBuffer())
+
+          v2.uploader.upload_stream({ resource_type: "auto", folder: "nextjs-full-stack-blog" }, (err, result) => {
+            if (err) {
+              console.log(err)
+              return reject(err)
+            } else if (result) {
+              resolve(result)
+            }
+          }).end(buffer)
+
+        })
+
+      }
+
+
+
+
+      export const POST = async (req: Request) => {
+
+        v2.config({
+
+          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET
+        });
+
+        try {
+          await connectToDb()
+
+
+          const formData = await req.formData()
+          const { title, description, location, userId, categoryId } = JSON.parse(formData.get('postData') as string)
+
+          if (!title || !description || !location || !userId || !categoryId) return generateErrorMessage({ reason: "invalid Data" }, 422)
+
+          const file = formData.get('image') as Blob | null
+
+
+
+
+          // upload image
+          let uploadedFile: UploadApiResponse | null = null
+
+          if (file) {
+            uploadedFile = await uploadImage(file)
+          } else {
+            uploadedFile = null
+          }
+
+          await connectToDb()
+          const user = await prisma.user.findFirst({ where: { id: userId } })
+          const category = await prisma.category.findFirst({ where: { id: categoryId } })
+
+
+          if (!user || !category) return generateErrorMessage({ reason: "invalid User or Category Id" }, 401)
+
+          const blog = await prisma.blog.create({
+            data:
+              { title, description, location, categoryId, userId, imageUrl: uploadedFile?.url ?? null }
+          })
+
+          return genereateSucessMessage({ blog }, 201)
+        } catch (error) {
+          return generateErrorMessage({ error }, 500)
+        } finally {
+          await prisma.$disconnect()
+        }
+      }
+
+
+Note test in Postman
+
+
+# Blog [id] routes
+
+in  Api /blogs / create a [id] folder , inside create a route.tsx file
+
+
+GET SINGLE  BLOG -- UPDATE BLOG -- DELETE BLOG
+code:
+
+        import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+        import prisma from "@/prisma"
+
+
+        export const GET = async (req: Request, { params }: { params: { id: string } }) => {
+
+          try {
+            await connectToDb()
+            const blog = await prisma.blog.findFirst({ where: { id: params.id } })
+
+            return genereateSucessMessage({ blog }, 200)
+          } catch (error) {
+            return generateErrorMessage({ error }, 500)
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+
+        export const PUT = async (req: Request, { params }: { params: { id: string } }) => {
+
+          try {
+
+            const { title, description } = await req.json()
+            if (!title || !description) {
+              return generateErrorMessage({ reason: 'Invalid Data' }, 422)
+            }
+
+            await connectToDb()
+            const blog = await prisma.blog.update({
+              where: { id: params.id },
+              data: { title, description }
+            })
+
+            return genereateSucessMessage({ blog }, 200)
+          } catch (error) {
+            return generateErrorMessage({ error }, 500)
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+
+        export const DELETE = async (req: Request, { params }: { params: { id: string } }) => {
+
+          try {
+            await connectToDb()
+            const blog = await prisma.blog.delete({ where: { id: params.id } })
+
+            return genereateSucessMessage({ blog }, 200)
+          } catch (error) {
+            return generateErrorMessage({ error }, 500)
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+
+
+Note test All 3 in Postman
+
+# Blog search by  blog title using Params  ?
+
+We will use this to search by title base on params ?
+example /api/search?title=test
+
+
+in  Api / create a search folder , inside create a route.tsx file
+
+code: 
+
+        import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
+        import prisma from "@/prisma"
+
+
+        export const GET = async (req: Request) => {
+
+          const searchTitle = new URL(req.url).searchParams.get('title')
+          console.log(searchTitle)
+
+          try {
+            await connectToDb()
+            const blogs = await prisma.blog.findMany({
+              where:
+                { title: { contains: searchTitle ?? '' } }
+            })
+
+            return genereateSucessMessage({ blogs }, 200)
+          } catch (error) {
+            return generateErrorMessage({ error }, 500)
+          } finally {
+            await prisma.$disconnect()
+          }
+        }
+
+Note test Search in Postman
+
 
 
 ## Next Steps -----------------------------------------------   >>> 
@@ -584,8 +827,6 @@ Now You can test on  Postman , test create and  view all categories
 ## Next Steps -----------------------------------------------   >>> 
   
 
-
-## 4 Blogs Api  Upload image
 ## 5 Frontend
 ## 6 Homepage
 ## 7 Blogs Page
