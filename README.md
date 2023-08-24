@@ -33,71 +33,72 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
+## Steps we will try to take
 
-## Steps we will try to take 
-1. DB SETUP  + Design
+1. DB SETUP + Design
 2. Next-auth
-3. Api Design 
-4. Blogs Api  Upload image
+3. Api Design
+4. Blogs Api Upload image
 5. Frontend
 6. Homepage
 7. Blogs Page
 8. RichText Editor
-9. View Page 
+9. View Page
 10. Profile Page
-11. Edit + Delete Functionality 
+11. Edit + Delete Functionality
 12. Search Page Functionality
 13. Login + Signup pages
-14. Optimization 
+14. Optimization
 
+## 1 DB SETUP + Design
 
-## 1 DB SETUP  + Design 
+## Install
 
-## Install 
-next13 command  npx create-next-app@latest
-prisma  command  npm I -D prisma
-  Init Prisma command npx prisma init
-
+next13 command npx create-next-app@latest
+prisma command npm I -D prisma
+Init Prisma command npx prisma init
 
 ## Prisma
+
 add provider = "prisma-client-js"
 and datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+provider = "mongodb"
+url = env("DATABASE_URL")
 
-  on Env add url for MongoAtlas 
+on Env add url for MongoAtlas
 }
 
-
 # Create Prisma models
-in Schema.prisma
-Models needed are  User, Blog, Category 
 
-sample 
+in Schema.prisma
+Models needed are User, Blog, Category
+
+sample
 generator client {
-  provider = "prisma-client-js"
+provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+provider = "mongodb"
+url = env("DATABASE_URL")
 }
 
 model User {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String?
-  email    String   @unique
-  password String
+id String @id @default(auto()) @map("\_id") @db.ObjectId
+name String?
+email String @unique
+password String
 }
 
 # Sync DB to MongoAtlas
+
 command npx prisma db push 
- Note: You should be able to see changes in MongoAtlas or any DB that you are using 
+Note: You should be able to see changes in MongoAtlas or any DB that you are using
 
+# Create index.ts
 
-# Create index.ts 
-Do this to prevent Prisma from creating multiple coneciton 
-      import { PrismaClient } from "@prisma/client";
+Do this to prevent Prisma from creating multiple coneciton
+import { PrismaClient } from "@prisma/client";
 
       let prisma: PrismaClient;
       declare global {
@@ -119,22 +120,17 @@ Do this to prevent Prisma from creating multiple coneciton
 
       export default prisma;
 
-
-
-
 ## 2 Next-auth
-  we will work on installing nextAuth for authentication 
- Site:  https://next-auth.js.org/getting-started/example
 
+we will work on installing nextAuth for authentication
+Site: https://next-auth.js.org/getting-started/example
 
+# connectToDb
 
-
-
-# connectToDb 
 create a folder and call it: lib
 in lib folder create a file name : helpers.ts
 
-and create connect function 
+and create connect function
 
      import prisma from "@/prisma"
 
@@ -146,18 +142,16 @@ and create connect function
       }
     }
 
+# create register route
 
-  
-  # create  register route 
-  in app / api / auth / register/ router.ts 
+in app / api / auth / register/ router.ts
 
-  here we will create a  reagistration route for users to register with credentials
+here we will create a reagistration route for users to register with credentials
 
+First download bcrypt: command npm i bcrypt
+than for typescrytt types with bctypt download npm i --save-dev @types/bcrypt
 
-First download bcrypt: command npm i bcrypt 
-than for typescrytt types with bctypt download   npm i --save-dev @types/bcrypt
-
-// Add this to  route.ts 
+// Add this to route.ts
 
 import { connectToDb } from "@/lib/helpers"
 import prisma from "@/prisma"
@@ -165,15 +159,14 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
 
 export const POST = async (req: Request) => {
-  const { name, email, password } = await req.json()
+const { name, email, password } = await req.json()
 
-  if (!name || !email || !password) {
-    return NextResponse.json({ message: 'Invalid Data' }, { status: 422 })
-  }
+if (!name || !email || !password) {
+return NextResponse.json({ message: 'Invalid Data' }, { status: 422 })
+}
 
-
-  try {
-    await connectToDb()
+try {
+await connectToDb()
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -182,39 +175,38 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ message: 'User Created Successfully', ...user }, { status: 201 })
 
-  } catch (error: any) {
-    return NextResponse.json({ message: 'Server Error', ...error }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
-  }
+} catch (error: any) {
+return NextResponse.json({ message: 'Server Error', ...error }, { status: 500 })
+} finally {
+await prisma.$disconnect()
+}
 
 }
 
+# go to postman
 
-# go to postman 
 create user in postman
-try to create user in postman  via  a POST req
+try to create user in postman via a POST req
 
-// Add in body 
+// Add in body
 {
-    "name": "carmen",
-    "email": "carmen@gmail.com",
-    "password": "123456"
+"name": "carmen",
+"email": "carmen@gmail.com",
+"password": "123456"
 }
 
+# Install + Setup for NextAuth
 
-# Install + Setup for NextAuth 
 Install comand npm install next-auth
-then 
-To add NextAuth.js to a project create a file called [...nextauth].js insde app/api/[...nextauth] then crate a route.ts file  
+then
+To add NextAuth.js to a project create a file called [...nextauth].js insde app/api/[...nextauth] then crate a route.ts file
 
-Note:  contains the dynamic route handler for NextAuth.js which will also contain all of your global NextAuth.js configurations.
+Note: contains the dynamic route handler for NextAuth.js which will also contain all of your global NextAuth.js configurations.
 
-
-Note for Step Bellow i neeed the github and google  secret an client id , Also need to create a secret and add all to .ENV  
+Note for Step Bellow i neeed the github and google secret an client id , Also need to create a secret and add all to .ENV
 
 NEXTAUTH_SECRET="create-a-secret-here"
-   Note you can create one with Command openssl rand -base64 32
+Note you can create one with Command openssl rand -base64 32
 
 GITHUB_CLIENT_ID='your-clientId-here'
 GITHUB_CLIENT_SECRET='your-client-secret-here'
@@ -222,10 +214,7 @@ GITHUB_CLIENT_SECRET='your-client-secret-here'
 GOOGLE_CLIENT_ID=''your-secret-here'
 GOOGLE_CLIENT_SECRET='GOCSPX-your-client-secret-here'
 
-
-
-
-Sample folder content   
+Sample folder content
 
         import NextAuth from "next-auth"
         import GithubProvider from "next-auth/providers/github"
@@ -243,19 +232,18 @@ Sample folder content
 
         export default NextAuth(authOptions)
 
+# Continue in NextAuth credentials login
 
-
-# Continue in NextAuth  credentials login
-  Add this code
-        CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'text', placeholder: 'jsmith' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials, req) {
-        // const user = { id: 1, name: 'Alex', email: 'alex@gmail.com' }
-        // return user
+Add this code
+CredentialsProvider({
+name: 'credentials',
+credentials: {
+email: { label: 'Email', type: 'text', placeholder: 'jsmith' },
+password: { label: 'Password', type: 'password' },
+},
+async authorize(credentials, req) {
+// const user = { id: 1, name: 'Alex', email: 'alex@gmail.com' }
+// return user
 
         // check to see if email and password is there
         if (!credentials || !credentials.email || !credentials.password) {
@@ -306,32 +294,31 @@ Sample folder content
       },
     }),
 
+# go to postman and try to login
 
-# go to postman  and try to login  
-try to  login in postman or by going to 
+try to login in postman or by going to
 http://localhost:3000/api/auth/signin
 
 Note try only credentials, social should not work untill we add the  
 clientId and clientSecret for each provider
 
-// Add in body 
+// Add in body
 {
-    "email": "carmen@gmail.com",
-    "password": "123456"
+"email": "carmen@gmail.com",
+"password": "123456"
 }
 
-Note if sucessfull in  terminal on google in coookies you should see 3 items under nextAuth
+Note if sucessfull in terminal on google in coookies you should see 3 items under nextAuth
 
+# how to view session in server componets
 
-# how to  view session in server componets
-Try going to page.tsx and enter this code 
+Try going to page.tsx and enter this code
 
- Use code 
-  import { getServerSession } from "next-auth"
-  import { authOptions } from "./api/auth/[...nextauth]/route"
+Use code
+import { getServerSession } from "next-auth"
+import { authOptions } from "./api/auth/[...nextauth]/route"
 
-
-  export default async function Home() {
+export default async function Home() {
 
     const data = await getServerSession(authOptions)
 
@@ -341,78 +328,75 @@ Try going to page.tsx and enter this code
         <pre>{JSON.stringify(data, null, 2)}</pre>
       </div>
     )
-  }
 
-# how to  view session in Client componets
-  We must wrap our app in a session component
+}
 
-  1. create a new folder in app and call it context, inside create a file and call it Provider
+# how to view session in Client componets
 
-  2. add this code 
-      'use client';
+We must wrap our app in a session component
 
-        import { SessionProvider } from "next-auth/react";
+1.  create a new folder in app and call it context, inside create a file and call it Provider
 
-        const Provider = ({ children }: { children: React.ReactNode }) => (
-          <SessionProvider  >
-            {children}
-          </SessionProvider>
-        )
+2.  add this code
+    'use client';
 
-        export default Provider;
+    import { SessionProvider } from "next-auth/react";
 
+    const Provider = ({ children }: { children: React.ReactNode }) => (
+    <SessionProvider  >
+    {children}
+    </SessionProvider>
+    )
 
-  3. go to layout an wrapp app in provider 
-          <body className={inter.className}>
-            <Provider>
-              <main>
-                {children}
-              </main>
-            </Provider>
-          </body>
+    export default Provider;
 
+3.  go to layout an wrapp app in provider
+    <body className={inter.className}>
+    <Provider>
+    <main>
+    {children}
+    </main>
+    </Provider>
+    </body>
 
-  3. create a test page (client) to view  session 
+4.  create a test page (client) to view session
     In app create a folder (pages) , inside create , Folder TestingSessionPage, inside cratre a page.tsx
 
-    code 
-        'use client'
+    code
+    'use client'
 
-        import { useSession } from "next-auth/react"
+         import { useSession } from "next-auth/react"
 
-        const TestingSessionPage = () => {
+         const TestingSessionPage = () => {
 
-          const { data, status } = useSession()
+           const { data, status } = useSession()
 
-          return (
-            <div>
-              <h2>Client</h2>
-              <pre>{JSON.stringify(data, null, 2)}</pre>
-            </div>
-          )
-        }
+           return (
+             <div>
+               <h2>Client</h2>
+               <pre>{JSON.stringify(data, null, 2)}</pre>
+             </div>
+           )
+         }
 
-        export default TestingSessionPage
+         export default TestingSessionPage
 
-Note you should see session data on the screen 
+Note you should see session data on the screen
 note the expires is one month from now
 
+## 3 Api Design
 
+# User API
 
-## 3 Api Design 
-
-
-#  User API
-
-In Api create a Users folder, here we will  create our user api routes
+In Api create a Users folder, here we will create our user api routes
 then create a file call it route.ts
 
-GET ALL USERS  
+GET ALL USERS
 
-Code: 
-    import { connectToDb } from "@/lib/helpers"
-    import prisma from "@/prisma"
-    import { NextResponse } from "next/server"
+Code:
+import { connectToDb } from "@/lib/helpers"
+import prisma from "@/prisma"
+import { NextResponse } from "next/server"
 
     export const GET = async () => {
       try {
@@ -428,16 +412,16 @@ Code:
     }
 
 Note can test it in postman or by going to
- http://localhost:3000/api/users
+http://localhost:3000/api/users
 
 In users create a new folder call it [id] and inside it a file route.ts
 
 GET SINGLE USER
 
- Code 
-    import { connectToDb } from "@/lib/helpers"
-    import prisma from "@/prisma"
-    import { NextResponse } from "next/server"
+Code
+import { connectToDb } from "@/lib/helpers"
+import prisma from "@/prisma"
+import { NextResponse } from "next/server"
 
     export const GET = async (req: Request, { params }: { params: { id: string } }) => {
 
@@ -459,14 +443,12 @@ GET SINGLE USER
       }
     }
 
-
 Note can test it in postman or by going to
- http://localhost:3000/api/users/{user-id-here}
+http://localhost:3000/api/users/{user-id-here}
 
+# Create functions to stop using nextResponse
 
-
-# Create functions to  stop using nextResponse 
-in Lib  on the helpers  folder create this 2 functions 
+in Lib on the helpers folder create this 2 functions
 
     export const genereateSucessMessage = (data: any, status: number) => {
       return NextResponse.json({ message: 'success', ...data }, { status, statusText: 'OK' })
@@ -476,18 +458,13 @@ in Lib  on the helpers  folder create this 2 functions
       return NextResponse.json({ message: 'Error', ...data }, { status, statusText: 'ERROR' })
     }
 
+# Categories Api
 
+In Api create a categories folder, here we will create our categories api routes
+then create a file call it route.ts
 
+GET ALL CATEGORIES
 
-#  Categories Api
-
-
-  In Api create a categories folder, here we will  create our categories api routes
-  then create a file call it route.ts
-
-  GET ALL CATEGORIES  
-
-  
       import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
       import prisma from "@/prisma"
       import { NextResponse } from "next/server"
@@ -500,7 +477,7 @@ in Lib  on the helpers  folder create this 2 functions
             return genereateSucessMessage(categories, 200)
 
           } catch (error) {
-            
+
             return generateErrorMessage(error, 500)
 
           } finally {
@@ -508,10 +485,7 @@ in Lib  on the helpers  folder create this 2 functions
           }
         }
 
-
-
-  CREATE CATEGORY
-
+CREATE CATEGORY
 
         export const POST = async (req: Request) => {
 
@@ -529,21 +503,15 @@ in Lib  on the helpers  folder create this 2 functions
           }
         }
 
+Note can go to Postman and attempt to create category
+Note : since in categories schema we use an ENUM we can only accept this names:
+art, education, science, politics
 
-  Note can go to Postman and attempt to create category
-  Note : since in categories schema we use an ENUM we can only accept this names:
-   art, education, science, politics
+Now You can test on Postman , test create and view all categories
 
+CREATE GET SINGLE
 
-Now You can test on  Postman , test create and  view all categories
-
-
-
-
-  CREATE GET SINGLE 
-
-  in  categories folder inside api , crate a  [id] folder and inside a route.tsx file then  enter this code  to get single cateegory base on id
-
+in categories folder inside api , crate a [id] folder and inside a route.tsx file then enter this code to get single cateegory base on id
 
           import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
           import prisma from "@/prisma"
@@ -573,26 +541,19 @@ Now You can test on  Postman , test create and  view all categories
 
 
 
-    Note:    Now You can test on  Postman 
+    Note:    Now You can test on  Postman
 
+## 4 Blogs Api + Upload image
 
-
-
-
-
-## 4 Blogs Api  + Upload image
-
-
-
-# Cloudinary Setup 
+# Cloudinary Setup
 
     To be able to upload images we need to go to cloudiary and get
 
-    1. Install cludinary 
+    1. Install cludinary
         command  = npm i cloudinary
 
     2. then on    https://cloudinary.com/
-      you need to create account and then get all this info: 
+      you need to create account and then get all this info:
 
           CLOUDINARY_CLOUD_NAME=(add-here)
           CLOUDINARY_API_KEY=(add-here)
@@ -600,15 +561,10 @@ Now You can test on  Postman , test create and  view all categories
 
     3. Add all this to .env
 
-
-
-
-
 # GET ALL BLOGS
 
- In Api create a blogs folder, here we will  create our blogs api routes
-  then create a file call it route.ts
-
+In Api create a blogs folder, here we will create our blogs api routes
+then create a file call it route.ts
 
     import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
     import prisma from "@/prisma"
@@ -629,8 +585,8 @@ Now You can test on  Postman , test create and  view all categories
       }
     }
 
+# Create a Blog
 
-# Create a Blog 
       import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
       import prisma from "@/prisma"
       import { v2, UploadApiResponse } from 'cloudinary'
@@ -711,16 +667,13 @@ Now You can test on  Postman , test create and  view all categories
         }
       }
 
-
 Note test in Postman
-
 
 # Blog [id] routes
 
-in  Api /blogs / create a [id] folder , inside create a route.tsx file
+in Api /blogs / create a [id] folder , inside create a route.tsx file
 
-
-GET SINGLE  BLOG -- UPDATE BLOG -- DELETE BLOG
+GET SINGLE BLOG -- UPDATE BLOG -- DELETE BLOG
 code:
 
         import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
@@ -780,19 +733,16 @@ code:
           }
         }
 
-
-
 Note test All 3 in Postman
 
-# Blog search by  blog title using Params  ?
+# Blog search by blog title using Params ?
 
 We will use this to search by title base on params ?
 example /api/search?title=test
 
+in Api / create a search folder , inside create a route.tsx file
 
-in  Api / create a search folder , inside create a route.tsx file
-
-code: 
+code:
 
         import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
         import prisma from "@/prisma"
@@ -820,45 +770,37 @@ code:
 
 Note test Search in Postman
 
-
-
-
 ## 5 Frontend
 
-
-
-1. Edit Layout to make it full screen  also edit title and description 
-2. go to page.tsx  remove everithing and leave as sever component
+1. Edit Layout to make it full screen also edit title and description
+2. go to page.tsx remove everithing and leave as sever component
 3. create navbar component as client
-4. create logo component as server 
-4. create footer component as server 
-5. add them to  layout.tsx 
-5. create homecomponent as server 
-
-
+4. create logo component as server
+5. create footer component as server
+6. add them to layout.tsx
+7. create homecomponent as server
 
 ## 6 Homepage
 
-1. Create basic homepage structure 
-2. Add image from unsplash.com
-3. Since image will be from an external website we need to add it to  next.config.js plus restart server 
+1.  Create basic homepage structure
+2.  Add image from unsplash.com
+3.  Since image will be from an external website we need to add it to next.config.js plus restart server
 
-      Code 
-      /** @type {import('next').NextConfig} */
-        const nextConfig = {
-          images: {
-            domains: ['images.unsplash.com', 'res.cloudinary.com', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
-          },
-        }
+    Code
+    /\*_ @type {import('next').NextConfig} _/
+    const nextConfig = {
+    images: {
+    domains: ['images.unsplash.com', 'res.cloudinary.com', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
+    },
+    }
 
         module.exports = nextConfig
 
+4.  should be able to see image
+5.  create a function to getAllBlogs in helpers
+    Since we migth re-user the blgos fucntion we can created in a separate location for easy reause on server components
 
-4. should be able to see image
-5. create a function to  getAllBlogs in  helpers
-    Since we migth re-user the blgos fucntion we can  created in a separate location for easy reause on server components
-
-    Code: 
+    Code:
 
         export const getAllBlogs = async (count?: number) => {
           const res = await fetch('http://localhost:3000/api/blogs', { next: { revalidate: 5 } });
@@ -871,25 +813,20 @@ Note test Search in Postman
           return data.blogs
         }
 
-6. use the funciton on top of homecomponet  to get all the blogs
+6.  use the funciton on top of homecomponet to get all the blogs
 
     const blogs = await getAllBlogs(6)
 
-7. in Homecomponent  display blogs using the map function 
+7.  in Homecomponent display blogs using the map function
 
+    {blogs?.map((blog) => (
+    <div key={blog.id}> Hello </div>
+    ))}
 
-      {blogs?.map((blog) => (
-        <div key={blog.id}> Hello </div>
-      ))}
+8.  create BlogItem component
+    This will display each blog item card.
 
-
-
-8. create BlogItem component
-   This will display each blog item card.
-
-
-9. create types file in lib, this will be use for typescript types
-
+9.  create types file in lib, this will be use for typescript types
 
         export type BlogItemTypes = {
         id: string,
@@ -902,48 +839,43 @@ Note test Search in Postman
         categoryId: string;
         location: string;
         isProfile?: boolean
-      }
 
+    }
 
-      export type UserItemType = {
-        id: string,
-        name: string;
-        email: string;
-        Blogs: BlogItemTypes[];
-        _count: { Blogs: number };
-        message: string
-      }
+    export type UserItemType = {
+    id: string,
+    name: string;
+    email: string;
+    Blogs: BlogItemTypes[];
+    \_count: { Blogs: number };
+    message: string
+    }
 
- 10. In Homecomponent uset the BlogItemTypes for the blogs.map
-          {blogs?.map((blog: BlogItemTypes) => (
-          <BlogItem key={blog.id} {...blog} />
-        ))}
+10. In Homecomponent uset the BlogItemTypes for the blogs.map
+    {blogs?.map((blog: BlogItemTypes) => (
+    <BlogItem key={blog.id} {...blog} />
+    ))}
 
-
-   Also   pass the props to Blog Item 
+Also pass the props to Blog Item
 
          <BlogItem key={blog.id} {...blog} />
 
+11. In BlogItem receive props and display info in the newly created card.
+12. Display props in card, also need to create a fucntion to retrieve the HTML from description
 
-11. In BlogItem  receive props and display info in the newly created card.
-    
-12. Display props in card, also need to create a fucntion to retrieve the HTML from description 
-  
-  code: 
-        function getTextFromHtml(html: string) {
-          const elem = document.createElement('span')
-          elem.innerHTML = html
-
+code:
+function getTextFromHtml(html: string) {
+const elem = document.createElement('span')
+elem.innerHTML = html
 
           return elem.innerText
         }
 
+13. then in the Description div use the line-clamp-6 , to limit the text to 6 lines
 
-13.  then in the  Description  div  use the line-clamp-6 , to limit the  text to 6 lines
-
-15. On the read more , make it a link that goes to  
+14. On the read more , make it a link that goes to  
     code:
-          <Link href={`/blogs/${props.id}`} className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center ">
+    <Link href={`/blogs/${props.id}`} className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center ">
 
               <div className='flex justify-center items-center gap-2'>
                 Read more
@@ -951,40 +883,34 @@ Note test Search in Postman
             </div>
           </Link>
 
-16.   Add props types as BlogItemTypes
+15. Add props types as BlogItemTypes
 
-    code: 
-     
+    code:
+
     const BlogItem = (props: BlogItemTypes) => {
 
-     }
- 
-
+    }
 
 16. You should seee cards of all the blogs and they should be responsive
 
-
-
-
 ## 7 Blogs Page
 
+## Next Steps ----------------------------------------------- >>>
 
+## Next Steps ----------------------------------------------- >>>
 
-
-
-
-
-
-## Next Steps -----------------------------------------------   >>> 
-## Next Steps -----------------------------------------------   >>> 
-## Next Steps -----------------------------------------------   >>> 
-  
-
+## Next Steps ----------------------------------------------- >>>
 
 ## 8 RichText Editor
-## 9 View Page 
+
+## 9 View Page
+
 ## 10 Profile Page
-## 11 Edit + Delete Functionality 
+
+## 11 Edit + Delete Functionality
+
 ## 12 Search Page Functionality
+
 ## 13 Login + Signup pages
-## 14 Optimization 
+
+## 14 Optimization
