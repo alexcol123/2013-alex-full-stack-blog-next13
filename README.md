@@ -469,11 +469,11 @@ Note can test it in postman or by going to
 in Lib  on the helpers  folder create this 2 functions 
 
     export const genereateSucessMessage = (data: any, status: number) => {
-      return NextResponse.json({ message: 'success', data }, { status, statusText: 'OK' })
+      return NextResponse.json({ message: 'success', ...data }, { status, statusText: 'OK' })
     }
 
     export const generateErrorMessage = (data: any, status: number) => {
-      return NextResponse.json({ message: 'Error', data }, { status, statusText: 'ERROR' })
+      return NextResponse.json({ message: 'Error', ...data }, { status, statusText: 'ERROR' })
     }
 
 
@@ -833,16 +833,137 @@ Note test Search in Postman
 4. create logo component as server 
 4. create footer component as server 
 5. add them to  layout.tsx 
-5. create home component as server
-
-
-
-
-
+5. create homecomponent as server 
 
 
 
 ## 6 Homepage
+
+1. Create basic homepage structure 
+2. Add image from unsplash.com
+3. Since image will be from an external website we need to add it to  next.config.js plus restart server 
+
+      Code 
+      /** @type {import('next').NextConfig} */
+        const nextConfig = {
+          images: {
+            domains: ['images.unsplash.com', 'res.cloudinary.com', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
+          },
+        }
+
+        module.exports = nextConfig
+
+
+4. should be able to see image
+5. create a function to  getAllBlogs in  helpers
+    Since we migth re-user the blgos fucntion we can  created in a separate location for easy reause on server components
+
+    Code: 
+
+        export const getAllBlogs = async (count?: number) => {
+          const res = await fetch('http://localhost:3000/api/blogs', { next: { revalidate: 5 } });
+          const data = await res.json()
+
+
+          if (count) {
+            return data.blogs.slice(0, count)
+          }
+          return data.blogs
+        }
+
+6. use the funciton on top of homecomponet  to get all the blogs
+
+    const blogs = await getAllBlogs(6)
+
+7. in Homecomponent  display blogs using the map function 
+
+
+      {blogs?.map((blog) => (
+        <div key={blog.id}> Hello </div>
+      ))}
+
+
+
+8. create BlogItem component
+   This will display each blog item card.
+
+
+9. create types file in lib, this will be use for typescript types
+
+
+        export type BlogItemTypes = {
+        id: string,
+        title: string;
+        description: string;
+        imageUrl: string;
+        userId: string;
+        createdDate: string;
+        updatedDate: string;
+        categoryId: string;
+        location: string;
+        isProfile?: boolean
+      }
+
+
+      export type UserItemType = {
+        id: string,
+        name: string;
+        email: string;
+        Blogs: BlogItemTypes[];
+        _count: { Blogs: number };
+        message: string
+      }
+
+ 10. In Homecomponent uset the BlogItemTypes for the blogs.map
+          {blogs?.map((blog: BlogItemTypes) => (
+          <BlogItem key={blog.id} {...blog} />
+        ))}
+
+
+   Also   pass the props to Blog Item 
+
+         <BlogItem key={blog.id} {...blog} />
+
+
+11. In BlogItem  receive props and display info in the newly created card.
+    
+12. Display props in card, also need to create a fucntion to retrieve the HTML from description 
+  
+  code: 
+        function getTextFromHtml(html: string) {
+          const elem = document.createElement('span')
+          elem.innerHTML = html
+
+
+          return elem.innerText
+        }
+
+
+13.  then in the  Description  div  use the line-clamp-6 , to limit the  text to 6 lines
+
+15. On the read more , make it a link that goes to  
+    code:
+          <Link href={`/blogs/${props.id}`} className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center ">
+
+              <div className='flex justify-center items-center gap-2'>
+                Read more
+                <AiOutlineArrowRight size={18} />
+            </div>
+          </Link>
+
+16.   Add props types as BlogItemTypes
+
+  const BlogItem = (props: BlogItemTypes) => {  
+
+    ...
+  }        
+
+16. You should seee cards of all the blogs and they should be responsive
+
+
+
+
+## 7 Blogs Page
 
 
 
@@ -852,7 +973,7 @@ Note test Search in Postman
 ## Next Steps -----------------------------------------------   >>> 
   
 
-## 7 Blogs Page
+
 ## 8 RichText Editor
 ## 9 View Page 
 ## 10 Profile Page

@@ -29,9 +29,9 @@ export const POST = async (req: Request) => {
     await connectToDb()
     const category = await prisma.category.create({ data: { name } })
 
-    return genereateSucessMessage({ category }, 200)
+    return genereateSucessMessage(category , 200)
   } catch (error) {
-    return generateErrorMessage({ error }, 500)
+    return generateErrorMessage(error , 500)
   } finally {
     await prisma.$disconnect()
   }

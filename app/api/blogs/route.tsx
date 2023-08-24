@@ -29,9 +29,10 @@ export const GET = async () => {
     await connectToDb()
     const blogs = await prisma.blog.findMany()
 
-    return genereateSucessMessage({ blogs }, 200)
+
+    return genereateSucessMessage({blogs} , 200)
   } catch (error) {
-    return generateErrorMessage({ error }, 500)
+    return generateErrorMessage(error , 500)
   } finally {
     await prisma.$disconnect()
   }
