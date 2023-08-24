@@ -1,15 +1,10 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "./api/auth/[...nextauth]/route"
+import React from 'react'
+import HomeComponent from './components/HomeComponent'
 
-
-export default async function Home() {
-
-  const data = await getServerSession(authOptions)
-
+const Home = () => {
   return (
-    <div>
-      <h2>Server</h2>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
+    <HomeComponent />
   )
 }
+
+export default Home

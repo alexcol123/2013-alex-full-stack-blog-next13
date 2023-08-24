@@ -822,13 +822,36 @@ Note test Search in Postman
 
 
 
+
+## 5 Frontend
+
+
+
+1. Edit Layout to make it full screen  also edit title and description 
+2. go to page.tsx  remove everithing and leave as sever component
+3. create navbar component as client
+4. create logo component as server 
+4. create footer component as server 
+5. add them to  layout.tsx 
+5. create home component as server
+
+
+
+
+
+
+
+
+## 6 Homepage
+
+
+
+
 ## Next Steps -----------------------------------------------   >>> 
 ## Next Steps -----------------------------------------------   >>> 
 ## Next Steps -----------------------------------------------   >>> 
   
 
-## 5 Frontend
-## 6 Homepage
 ## 7 Blogs Page
 ## 8 RichText Editor
 ## 9 View Page 
