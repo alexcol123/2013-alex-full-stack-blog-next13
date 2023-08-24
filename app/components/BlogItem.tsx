@@ -18,11 +18,11 @@ function getTextFromHtml(html: string) {
   return elem.innerText
 }
 
-const BlogItem = (props: BlogItemTypes) => {
+const BlogItem = (props: BlogItemTypes) => { 
+
+  
 
 let shortDescription = getTextFromHtml(props?.description)
-
-
 
 
 
