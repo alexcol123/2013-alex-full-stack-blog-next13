@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Getting Started
 
 First, run the development server:
 
@@ -18,7 +18,7 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+# Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
@@ -27,13 +27,13 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+# Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-## Steps we will try to take
+# Steps we will try to take
 
 1. DB SETUP + Design
 2. Next-auth
@@ -50,7 +50,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 13. Login + Signup pages
 14. Optimization
 
-## 1 DB SETUP + Design
+# 1 DB SETUP + Design
 
 ## Install
 
@@ -68,7 +68,7 @@ url = env("DATABASE_URL")
 on Env add url for MongoAtlas
 }
 
-# Create Prisma models
+## Create Prisma models
 
 in Schema.prisma
 Models needed are User, Blog, Category
@@ -90,12 +90,12 @@ email String @unique
 password String
 }
 
-# Sync DB to MongoAtlas
+## Sync DB to MongoAtlas
 
 command npx prisma db push 
 Note: You should be able to see changes in MongoAtlas or any DB that you are using
 
-# Create index.ts
+## Create index.ts
 
 Do this to prevent Prisma from creating multiple coneciton
 import { PrismaClient } from "@prisma/client";
@@ -120,12 +120,12 @@ import { PrismaClient } from "@prisma/client";
 
       export default prisma;
 
-## 2 Next-auth
+# 2 Next-auth
 
 we will work on installing nextAuth for authentication
 Site: https://next-auth.js.org/getting-started/example
 
-# connectToDb
+## connectToDb
 
 create a folder and call it: lib
 in lib folder create a file name : helpers.ts
@@ -142,7 +142,7 @@ and create connect function
       }
     }
 
-# create register route
+## create register route
 
 in app / api / auth / register/ router.ts
 
@@ -183,7 +183,7 @@ await prisma.$disconnect()
 
 }
 
-# go to postman
+## go to postman
 
 create user in postman
 try to create user in postman via a POST req
@@ -195,7 +195,7 @@ try to create user in postman via a POST req
 "password": "123456"
 }
 
-# Install + Setup for NextAuth
+## Install + Setup for NextAuth
 
 Install comand npm install next-auth
 then
@@ -232,7 +232,7 @@ Sample folder content
 
         export default NextAuth(authOptions)
 
-# Continue in NextAuth credentials login
+## Continue in NextAuth credentials login
 
 Add this code
 CredentialsProvider({
@@ -294,7 +294,7 @@ async authorize(credentials, req) {
       },
     }),
 
-# go to postman and try to login
+## go to postman and try to login
 
 try to login in postman or by going to
 http://localhost:3000/api/auth/signin
@@ -310,7 +310,7 @@ clientId and clientSecret for each provider
 
 Note if sucessfull in terminal on google in coookies you should see 3 items under nextAuth
 
-# how to view session in server componets
+## how to view session in server componets
 
 Try going to page.tsx and enter this code
 
@@ -331,7 +331,7 @@ export default async function Home() {
 
 }
 
-# how to view session in Client componets
+## how to view session in Client componets
 
 We must wrap our app in a session component
 
@@ -384,9 +384,9 @@ We must wrap our app in a session component
 Note you should see session data on the screen
 note the expires is one month from now
 
-## 3 Api Design
+# 3 Api Design
 
-# User API
+## User API
 
 In Api create a Users folder, here we will create our user api routes
 then create a file call it route.ts
@@ -446,7 +446,7 @@ import { NextResponse } from "next/server"
 Note can test it in postman or by going to
 http://localhost:3000/api/users/{user-id-here}
 
-# Create functions to stop using nextResponse
+## Create functions to stop using nextResponse
 
 in Lib on the helpers folder create this 2 functions
 
@@ -458,7 +458,7 @@ in Lib on the helpers folder create this 2 functions
       return NextResponse.json({ message: 'Error', ...data }, { status, statusText: 'ERROR' })
     }
 
-# Categories Api
+## Categories Api
 
 In Api create a categories folder, here we will create our categories api routes
 then create a file call it route.ts
@@ -543,9 +543,9 @@ in categories folder inside api , crate a [id] folder and inside a route.tsx fil
 
     Note:    Now You can test on  Postman
 
-## 4 Blogs Api + Upload image
+# 4 Blogs Api + Upload image
 
-# Cloudinary Setup
+## Cloudinary Setup
 
     To be able to upload images we need to go to cloudiary and get
 
@@ -561,7 +561,7 @@ in categories folder inside api , crate a [id] folder and inside a route.tsx fil
 
     3. Add all this to .env
 
-# GET ALL BLOGS
+## GET ALL BLOGS
 
 In Api create a blogs folder, here we will create our blogs api routes
 then create a file call it route.ts
@@ -585,7 +585,7 @@ then create a file call it route.ts
       }
     }
 
-# Create a Blog
+## Create a Blog
 
       import { connectToDb, generateErrorMessage, genereateSucessMessage } from "@/lib/helpers"
       import prisma from "@/prisma"
@@ -669,7 +669,7 @@ then create a file call it route.ts
 
 Note test in Postman
 
-# Blog [id] routes
+## Blog [id] routes
 
 in Api /blogs / create a [id] folder , inside create a route.tsx file
 
@@ -735,7 +735,7 @@ code:
 
 Note test All 3 in Postman
 
-# Blog search by blog title using Params ?
+## Blog search by blog title using Params ?
 
 We will use this to search by title base on params ?
 example /api/search?title=test
@@ -770,7 +770,7 @@ code:
 
 Note test Search in Postman
 
-## 5 Frontend
+# 5 Frontend
 
 1. Edit Layout to make it full screen also edit title and description
 2. go to page.tsx remove everithing and leave as sever component
@@ -780,7 +780,7 @@ Note test Search in Postman
 6. add them to layout.tsx
 7. create homecomponent as server
 
-## 6 Homepage
+# 6 Homepage
 
 1.  Create basic homepage structure
 2.  Add image from unsplash.com
@@ -893,7 +893,7 @@ elem.innerHTML = html
 
 16. You should seee cards of all the blogs and they should be responsive
 
-## 7 Blogs Page
+# 7 Blogs Page
 
 1.  create a blogs page in the App folder , inside create page.tsx file
 2.  create basic structure for a blogs page
@@ -941,26 +941,26 @@ const blogs = await getAllBlogs(20)
 
 7.  you should be able to view blogs and the filter and search components will not work yet since we have not added the functionality
 
-## 8 Add Blog page with RichText Editor
+# 8 Add Blog page with RichText Editor
 
-## Next Steps ----------------------------------------------- >>>
+# Next Steps ----------------------------------------------- >>>
 
-## Next Steps ----------------------------------------------- >>>
+# Next Steps ----------------------------------------------- >>>
 
-## Next Steps ----------------------------------------------- >>>
+# Next Steps ----------------------------------------------- >>>
 
-## 9 View Page
+# 9 View Page
 
-## 10 Profile Page
+# 10 Profile Page
 
-## 11 Edit + Delete Functionality
+# 11 Edit + Delete Functionality
 
-## 12 Search Page Functionality
+# 12 Search Page Functionality
 
-## 13 Login + Signup pages
+# 13 Login + Signup pages
 
-## 14 Optimization
+# 14 Optimization
 
-## 15 add pagination
+# 15 add pagination
 
-## 16 add filter by
+# 16 add filter by
