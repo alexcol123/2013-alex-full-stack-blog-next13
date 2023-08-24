@@ -895,13 +895,59 @@ elem.innerHTML = html
 
 ## 7 Blogs Page
 
-## Next Steps ----------------------------------------------- >>>
+1.  create a blogs page in the App folder , inside create page.tsx file
+2.  create basic structure for a blogs page
+    on top we need a search component and search button to filter by title, also a filter dropdown to filter by category
+
+3.  below we just need a section to display all blogs
+
+4.  in Lib folder create a function to get al catagories
+    code:
+
+    export const getAllCategories =async () => {
+    const res = await fetch('http://localhost:3000/api/categories/' );
+    const data = await res.json()
+
+        return data.categories
+
+    }
+
+5.  in the blogs page import getAllCategories ,
+    then call the funciton
+
+    const categories = await getAllCategories()
+
+    then user the function in the Filter select
+
+code:
+
+          <select name="category" id="select" className='md:px-5 xs:px-2 w-3/4 mx-2 py-3 rounded-lg' >
+            {categories?.map((item: { id: string, name: string }) => (
+              <option key={item.id} className='rounded-md bg-gray-100' value={item.id} > {item.name}</option>
+            ))}
+          </select>
+
+5.  then call the getAllBlogs function on the blogs page
+
+const blogs = await getAllBlogs(20)
+
+6.  then use the getAllBlogs function to display all our blogs on the page
+
+    code:
+
+        {blogs?.map((blog: BlogItemTypes) => (
+          <BlogItem key={blog.id} {...blog} />
+        ))}
+
+7.  you should be able to view blogs and the filter and search components will not work yet since we have not added the functionality
+
+## 8 Add Blog page with RichText Editor
 
 ## Next Steps ----------------------------------------------- >>>
 
 ## Next Steps ----------------------------------------------- >>>
 
-## 8 RichText Editor
+## Next Steps ----------------------------------------------- >>>
 
 ## 9 View Page
 
@@ -914,3 +960,7 @@ elem.innerHTML = html
 ## 13 Login + Signup pages
 
 ## 14 Optimization
+
+## 15 add pagination
+
+## 16 add filter by
