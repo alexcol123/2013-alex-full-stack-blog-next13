@@ -953,10 +953,9 @@ Note test Search in Postman
 
 16.   Add props types as BlogItemTypes
 
-  const BlogItem = (props: BlogItemTypes) => {  
-
-    ...
-  }        
+      const BlogItem = (props: BlogItemTypes) => {
+        
+        } 
 
 16. You should seee cards of all the blogs and they should be responsive
 
@@ -964,6 +963,10 @@ Note test Search in Postman
 
 
 ## 7 Blogs Page
+
+
+
+
 
 
 

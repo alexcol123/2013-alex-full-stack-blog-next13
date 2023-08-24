@@ -4,7 +4,7 @@
 import { BlogItemTypes } from '@/lib/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import { ReactDOM, } from 'react'
 import { AiOutlineArrowRight } from 'react-icons/ai'
 
 
@@ -20,9 +20,10 @@ function getTextFromHtml(html: string) {
 
 const BlogItem = (props: BlogItemTypes) => {
 
+let shortDescription = getTextFromHtml(props?.description)
 
 
-  const shortDescription = getTextFromHtml(props?.description)
+
 
 
 
