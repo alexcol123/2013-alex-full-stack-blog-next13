@@ -1198,17 +1198,18 @@ Create a next-auth.d.ts file and add this code:
 22. Now you should be able to submit a blog ,
     Try It
 
-
 # 9 View Page
 
 
 
-## Next Steps ----------------------------------------------- >>>
 
-## Next Steps ----------------------------------------------- >>>
 
-## Next Steps ----------------------------------------------- >>>
 
+        ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
 
 # 10 Profile Page
 
@@ -1223,15 +1224,3 @@ Create a next-auth.d.ts file and add this code:
 # 15 add pagination
 
 # 16 add filter by
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```

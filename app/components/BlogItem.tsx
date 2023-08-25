@@ -32,27 +32,32 @@ const BlogItem = (props: BlogItemTypes) => {
   return (
     <div className="max-w-md mx-auto">
 
-      <div className="bg-white shadow-md border border-gray-200 rounded-lg max-w-sm ">
+      <div className="bg-white shadow-md border border-gray-200 rounded-lg max-w-sm w-[370px] min-h-[450px] flex flex-col ">
 
-        <div className='relative'>
-          <Image src={props.imageUrl} width='200' height='200' alt='blog image' className='object-cover w-full z-1 ' />
+        <div className='relative h-[200px] '>
+          <Image src={props.imageUrl} width='200' height='200' alt='blog image' className='object-cover object-center w-full z-1  h-48 ' />
 
           <div className=' absolute top-0 right-0 z-2 bg-gray-200 m-2 p-1 rounded flex items-center justify-center font-semibold'> <MdLocationOn size={20} className='text-purple-600' /> {props.location}</div>
         </div>
 
-        <div className="p-5">
+
+        <div className="  px-2 flex flex-col flex-1 h-full">
 
           <h5 className="text-gray-900 font-bold text-2xl tracking-tight mb-2 capitalize ">{props.title}</h5>
 
-          <p className="font-normal text-gray-700 my-6 dark:text-gray-400 line-clamp-4">{shortDescription}</p>
-          <Link href={`/blogs/${props.id}`} className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center ">
+          <p className="font-normal   text-gray-700 my-6  line-clamp-4 mb-auto">{shortDescription}</p>
 
-            <div className='flex justify-center items-center gap-2'>
+          <Link href={`/blogs/${props.id}`} className="self-end  mb-3 mr-2 text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center  w-fit ">
+
+            <div className='flex  items-center gap-1'>
               Read more
               <AiOutlineArrowRight size={18} />
             </div>
           </Link>
         </div>
+
+
+
       </div>
 
 
