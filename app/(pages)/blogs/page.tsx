@@ -38,7 +38,7 @@ const BlogsPage = async () => {
         </p>
       </div>
 
-      <nav className="bg-gray-100 border w-full flex mt-4 sticky top-0 bg-center gap-4 h-20 md:p-8 xs:p-2 justify-between items-center">
+      <nav className="bg-gray-100 border w-full flex mt-4 sticky top-0 bg-center gap-4 h-20 md:p-8 xs:p-2 justify-between items-center z-10">
 
         <div className="mr-auto  flex w-2/4 md:w-1/4  items-center gap-6  ">
           <p className="font-semibold text-2xl">Filter</p>

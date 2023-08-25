@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ReactDOM, } from 'react'
 import { AiOutlineArrowRight } from 'react-icons/ai'
 
-
+import { MdLocationOn } from 'react-icons/md'
 
 
 function getTextFromHtml(html: string) {
@@ -18,11 +18,12 @@ function getTextFromHtml(html: string) {
   return elem.innerText
 }
 
-const BlogItem = (props: BlogItemTypes) => { 
+const BlogItem = (props: BlogItemTypes) => {
 
-  
 
-let shortDescription = getTextFromHtml(props?.description)
+
+  let shortDescription = getTextFromHtml(props?.description)
+
 
 
 
@@ -33,7 +34,11 @@ let shortDescription = getTextFromHtml(props?.description)
 
       <div className="bg-white shadow-md border border-gray-200 rounded-lg max-w-sm ">
 
-        <Image src={props.imageUrl} width='200' height='200' alt='blog image' className='object-cover w-full' />
+        <div className='relative'>
+          <Image src={props.imageUrl} width='200' height='200' alt='blog image' className='object-cover w-full z-1 ' />
+
+          <div className=' absolute top-0 right-0 z-2 bg-gray-200 m-2 p-1 rounded flex items-center justify-center font-semibold'> <MdLocationOn size={20} className='text-purple-600' /> {props.location}</div>
+        </div>
 
         <div className="p-5">
 

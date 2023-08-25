@@ -943,13 +943,272 @@ const blogs = await getAllBlogs(20)
 
 # 8 Add Blog page with RichText Editor
 
-## Next Steps ----------------------------------------------- >>>
+## Here we will create a page to add blogs to database
 
-## Next Steps ----------------------------------------------- >>>
+1.  Inside blogs folder create a new folder call it add , and inside create a page.tsx file
+    this will be a client component per we will need state
+2.  Install npm install -S react-draft-wysiwyg
+    this is a text editor we will use to give the author more control on how their blogs look
 
-## Next Steps ----------------------------------------------- >>>
+3.  Grab the session
+    Code:
+
+    ```
+    import { useSession } from "next-auth/react"
+
+    const { data: session } = useSession()
+
+    ```
+
+    Note we will use the session to display the author name
+
+4.  Crate an h1 with a ref={headingRef } add contentEditable='true' so that we can edit thei title within the H1
+
+5.  install : npm i react-hook-form
+    we will use thist to manage our form state
+    then
+    import { useForm } from "react-hook-form"
+
+6.  In order to use react-hook-form we need to get the state bellow from useForm()
+
+// Use Form
+const { register, handleSubmit, formState: { errors } } = useForm();
+
+7.  Create file input to upload images
+
+    ```
+
+    <div className="w-full flex my-5">
+     <input
+       type="file" className="md:w-[500px] sm:w-[300px] m-auto text-slate-900   bg-gray-100 font-semibold rounded-xl p-4"
+
+       {...register('image', {
+         required: true,
+         onChange(event) {
+
+           setimageUrl(URL.createObjectURL(event.target.files[0]))
+         }
+       })}
+     />
+
+    </div>
+    ```
+
+Note: the code after the ... register is use to display the image on state change of our input of type FILE
+
+8.  Try to see if you can select and view an image
+
+9.  Create a location input :
+
+    ```
+        <div className="w-full flex my-5">
+        <input
+          type="text" className="md:w-[500px] sm:w-[300px] m-auto text-slate-900   bg-gray-100 font-semibold rounded-xl p-4"
+          placeholder="Location Ex: United States"
+          {...register('location', { required: true })}
+        />
+      </div>
+
+    ```
+
+10. Now we will work on creating a category select
+
+    In order to get the categories we need to create a function to get them , this code must be added on top and outside our BlogAddPage fucntion
+
+Code:
+
+```
+export const getAllCategories = async () => {
+const res = await fetch('http://localhost:3000/api/categories/');
+const data = await res.json()
+
+return data.categories
+}
+
+```
+
+11. Then we must call the getAllCategories in an UseEffect
+
+    code
+
+    ```
+      useEffect(() => {
+    const getAllCategories = async () => {
+      const res = await fetch('http://localhost:3000/api/categories/', { cache: 'no-store' });
+      const data = await res.json()
+
+      setcategories(data.categories)
+
+    }
+
+    getAllCategories()
+
+    }, [])
+    ```
+
+12. Create a category input :
+
+    ```
+     <div className="w-full flex my-5">
+        <select
+
+          className="md:w-[500px] sm:w-[300px] m-auto text-slate-900   bg-gray-100 font-semibold rounded-xl p-4"
+          {...register('category', { required: true })}
+        >
+          {categories.map((item: { id: string, name: string }) => (
+            <option key={item.id} value={item.id}>{item.name}</option>
+          ))}
+        </select>
+      </div>
+    ```
+
+13. Test that that you can see and select all categories
+
+14. Now we will work on the wysiwyg text editor
+    we will need to intall and get all this
+
+    ```
+      import { Editor } from 'react-draft-wysiwyg'
+      import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+      import { EditorState, convertToRaw } from "draft-js"
+      import draftToHtml from 'draftjs-to-html'
+      import { toast } from "react-hot-toast"
+    ```
+
+Note : Also install types to remove Typescript warnings if any
+
+15. create a fucntion to handle editor state change
+
+    code
+
+    ````
+    const handleEditorStateChange = (e: any) => {
+    setEditorState(e)
+    }
+    ```
+
+    ````
+
+16. get all data form form
+    we first need to add an onclick function to our Publish button, so that we can get the data form react-hook-form
+
+    onClick={handleSubmit(handlePost)}
+
+17. Then we will create a function and call it handlePost , this will be use to get all the state form the form , and latter try to send it to the server
+
+Note install: npm i react-hot-toast so that we can use alerts
+
+Example toast.loading('Sending your post to the World 🌎', { id: 'postData' })
+
+Code:
+
+    ```
+      const handlePost = async (data: any) => {
+          const formData = new FormData
+          const postData = JSON.stringify({
+            title: headingRef.current?.innerText,
+            description: convertEditorDataToHTML(),
+            location: data.location,
+            userId: session?.user.id,
+            categoryId: data.category
+          })
+
+          formData.append('postData', postData)
+          formData.append('image', data.image[0])
+
+          // console.log(formData.get('postData'))
+          // console.log(formData.get('image'))
+
+          try {
+            toast.loading('Sending your post to the World 🌎', { id: 'postData' })
+
+
+            await fetch('http://localhost:3000/api/blogs', {
+              method: "POST",
+              body: formData,
+              cache: 'no-store'
+            })
+
+            toast.success('Sending Completed 😺', { id: 'postData' })
+
+          } catch (error) {
+            toast.error('Sending failed 😹', { id: 'postData' })
+            return console.log(error)
+          }
+        }
+
+    ```
+
+Note: you should get an error or the UserId , we will address this in step 19
+userId: session?.user.id,
+
+18. Note to use the react-draft-wysiwyg
+
+    we need to use the import { EditorState, convertToRaw } from "draft-js"
+    const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
+    to Handle Editor state:
+
+         const handleEditorStateChange = (e: any) => {
+
+    setEditorState(e)
+    }
+
+    To conver the data to Html use the draftToHtml import draftToHtml from draftjs-to-html
+
+         const convertEditorDataToHTML = () => {
+         return draftToHtml(convertToRaw(editorState.getCurrentContent()))
+         }
+
+19. Now before being able to Submit the post we need the UserID from the Session
+    Go to the api/ auth /nextAuth folder
+
+In callbacks add this code to get The UserID
+
+Code :
+
+    callbacks: {
+    session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
+      }
+      return session
+    },
+
+},
+
+20. Now if we go back to blogs / add / page.tsx
+    and we console log the session we should be able to see an userId
+    this id , we will use to submit the blog per we need the userId;
+
+21. To remove warning from the userId in typescript do this:
+
+Create a next-auth.d.ts file and add this code:
+
+          import { DefaultSession } from "next-auth"
+
+          declare module 'next-auth' {
+            interface Session {
+              user: {
+                id: string
+              } & DefaultSession['user']
+            }
+          }
+
+22. Now you should be able to submit a blog ,
+    Try It
+
 
 # 9 View Page
+
+
+
+## Next Steps ----------------------------------------------- >>>
+
+## Next Steps ----------------------------------------------- >>>
+
+## Next Steps ----------------------------------------------- >>>
+
 
 # 10 Profile Page
 
@@ -964,3 +1223,15 @@ const blogs = await getAllBlogs(20)
 # 15 add pagination
 
 # 16 add filter by
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
