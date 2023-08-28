@@ -47,7 +47,7 @@ const BlogItem = (props: BlogItemTypes) => {
 
           <p className="font-normal   text-gray-700 my-6  line-clamp-4 mb-auto">{shortDescription}</p>
 
-          <Link href={`/blogs/${props.id}`} className="self-end  mb-3 mr-2 text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center  w-fit ">
+          <Link href={`/blogs/view/${props.id}`} className="self-end  mb-3 mr-2 text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center  w-fit ">
 
             <div className='flex  items-center gap-1'>
               Read more

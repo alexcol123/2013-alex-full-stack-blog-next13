@@ -1198,20 +1198,104 @@ Create a next-auth.d.ts file and add this code:
 22. Now you should be able to submit a blog ,
     Try It
 
-# 9 View Page
+# 9 BlogViewPage Page
+
+1.  inside blogs folder create a view folder/ inside /create a folder [id] , inside this folder create a new file , call it page.tsx , and export it as BlogViewPage, Should be server component
+
+Note : on the blog Item on the read more, this should be linked to
+
+          <Link href={`/blogs/view/${props.id}`} className="self-end  mb-3 mr-2 text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-2 text-center  w-fit ">
+
+            <div className='flex  items-center gap-1'>
+              Read more
+              <AiOutlineArrowRight size={18} />
+            </div>
+          </Link>
+
+2. In Lib helpers create a function to get blogs by Id
+
+code:
+
+```
+  export const getBlogById = async (id: string) => {
+   const res = await fetch(`http://localhost:3000/api/blogs/${id}`, { cache: 'no-store' })
+   const data = await res.json()
+
+   return data.blog
+}
+```
+
+3. call the function on the BlogViewPage
+   const blog = await getBlogById(params.id)
+
+4. create a section to display blog content
+
+   ```
+    <section  className='w-full h-full flex flex-col mt-8 mb-20 '>
 
 
+      <Image src={blog.imageUrl} alt={blog.title} height={400} width={400} className='md:w-2/4 xs:w-3/4 mx-auto shadow-xl rounded-lg' />
+
+      <div className='md:w-2/4 xs:w-3/4 mx-auto  rounded-lg '>
+        <h2 className='text-xl md:text-4xl   my-8 font-bold  text-center'  >{blog.title}</h2>
+      </div>
+
+      {/* html */}
+      <section id='blogHtml' className='md:w-2/4 xs:w-3/4 mx-auto bg-slate-50 p-4'
+        dangerouslySetInnerHTML={{ __html: blog.description }}
+      ></section>
+
+    </section>
 
 
+   ```
 
+5. We added and Id to the section Id: blogHtml we use this for stiling purposer
 
-        ## Next Steps ----------------------------------------------- >>>
+6. since we are using innerHtml as dangerouslySetInnerHTML,
+   you can add css in the globals.css for lists and heading to your liking.
 
-        ## Next Steps ----------------------------------------------- >>>
+7. sample Css
 
-        ## Next Steps ----------------------------------------------- >>>
+   ```
+          #blogHtml > h1 {
+          color: red;
+          padding: 10px;
+          font-size: 25px;
+          font: bold;
+          margin-bottom: 20px;
+          }
+
+        #blogHtml > h2 {
+        color: black;
+        padding: 7px;
+        font-size: 20px;
+
+        margin-bottom: 14px;
+        }
+
+        #blogHtml > ul {
+        padding: 20px;
+        list-style: square;
+        }
+
+        #blogHtml li {
+        color:rgb(60, 58, 58)
+        }
+
+        #blogHtml li:hover {
+        color:red
+        }
+
+   ```
 
 # 10 Profile Page
+
+        ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
 
 # 11 Edit + Delete Functionality
 
