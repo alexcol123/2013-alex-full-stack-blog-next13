@@ -1291,15 +1291,238 @@ code:
 
 # 10 Profile Page
 
-        ## Next Steps ----------------------------------------------- >>>
+1.  Create a profile folder in pages, then create a page.tsx file
+    export it as ProfilePage
 
-        ## Next Steps ----------------------------------------------- >>>
+    Note: Here we will display Iamge , Name , email , then we will show the blog count
 
-        ## Next Steps ----------------------------------------------- >>>
+2.  We need user info , so we need in lib helpers we need to create a function to get User,
+
+        ```
+        export const getUserById = async (id: string) => {
+
+          console.log('id  user ',id)
+          const res = await fetch('http://localhost:3000/api/users/' + id, { cache: 'no-store' });
+
+          const data = await res.json()
+
+          return data
+        }
+
+        ```
+
+3.  Before we can Call the new getUserById function we need to userId From the session function
+
+import { getServerSession } from 'next-auth'
+
+const sessionData = await getServerSession(authOptions)
+
+4.  Now we can call the getUserById and pass the Id as argument
+    this will provide us not only the user info but the blogs, since we set it up in prisma and in the API / users/ [id]/ GET , where we add the include:
+
+code below :
+
+```
+    const user = await prisma.user.findFirst({
+      where: { id: params.id },
+      include: { blogs: true, _count: true }
+    })
+```
+
+You can console log it and view all user data
+
+```
+
+  const sessionData = await getServerSession(authOptions)
+
+  const userData = await getUserById(sessionData?.user?.id)
+
+
+   console.log( userData)
+
+
+```
+
+5. now that we have the data we can display it in the profilePage
+
+   ```
+         import Image from 'next/image'
+         import React from 'react'
+         import { MdAttachEmail } from 'react-icons/md'
+         import UserIcon from '@/public/userIcon.png'
+         import { getAllBlogs, getUserById } from '@/lib/helpers'
+         import BlogItem from '../../components/BlogItem'
+         import { BlogItemTypes, UserItemType } from '@/lib/types'
+         import { getServerSession } from 'next-auth'
+         import { authOptions } from '../../api/auth/[...nextauth]/route'
+
+
+
+         const Profile = async () => {
+
+           const sessionData = await getServerSession(authOptions)
+
+           const userData = await getUserById(sessionData?.user?.id)
+           console.log(userData.blog)
+
+           return (
+
+             <section className='w-full h-full flex flex-col '>
+               <div>
+                 <Image src={sessionData?.user.image ?? UserIcon} alt='UserProfile ' width={200} height={200} className='h-20 w-20 object-cover mx-auto my-8 rounded-full bg-gray-50 border-4 border-purple-400 ' />
+               </div>
+               <div className=" mx-auto my-2">
+                 <h1 className="text-4xl font-semibold  w-fit  rounded-md capitalize">
+                   {sessionData?.user.name}
+                 </h1>
+               </div>
+
+               <div className=" mx-auto my-2">
+                 <h1 className="text-xl font-semibold  flex items-center   w-fit gap-1">
+                   <span> <MdAttachEmail /> </span>             {sessionData?.user.email}
+                 </h1>
+               </div>
+
+               <div className="w-full h-full flex flex-col">
+                 <div className='w-2/4 mx-auto'>
+                   <p className='text-center font-semibold text-xl  text-gray-50 bg-gray-400 border shadow-lg w-fit mx-auto rounded-md px-2'>🌟 Blogs Count: {userData?._count?.blogs} </p>
+                 </div>
+
+                 <div className="flex flex-wrap justy-center p-4 my-3">
+                   {userData?.blogs?.map((blog: BlogItemTypes) => <BlogItem key={blog.id} {...blog} isProfile={true} />)}
+                 </div>
+
+
+               </div>
+               {/* {JSON.stringify(userData.Blogs)} */}
+             </section>
+           )
+         }
+
+         export default Profile
+
+   ```
+
+6. Add buttons to Edit
+   in type propes add isProfileProperty: boolean
+
+then add the isProfile to Lib/ types/ in the BlogItemTypes
+and set to boolean make it conditional
+
+      isProfile?: boolean
+
+Note : we will use this to add an edit button to the BlogItem component if is in profile
+
+7. Now in the Profile page we will send the props to let it know is on profile mod
+
+code
+
+```
+      <div className="flex flex-wrap justy-center p-4 my-3 gap-8">
+          {userData?.blogs?.map((blog: BlogItemTypes) => <BlogItem key={blog.id} {...blog} isProfile={true} />)}
+        </div>
+```
+
+8. Now we will recieve the props in the blogItem component and here we will add buttons to disblay to delete and edit the blog
+
+code:
+
+```
+      'use client'
+
+
+      import { BlogItemTypes } from '@/lib/types'
+      import Image from 'next/image'
+      import Link from 'next/link'
+      import { ReactDOM, } from 'react'
+      import { AiOutlineArrowRight } from 'react-icons/ai'
+      import { RiDeleteBin6Fill } from 'react-icons/ri';
+      import { MdLocationOn } from 'react-icons/md'
+
+
+      function getTextFromHtml(html: string) {
+        const elem = document.createElement('span')
+        elem.innerHTML = html
+
+
+        return elem.innerText
+      }
+
+      const BlogItem = (props: BlogItemTypes) => {
+
+
+
+        let shortDescription = getTextFromHtml(props?.description)
+
+
+
+
+
+
+        return (
+          <div className="max-w-md mx-auto">
+
+            <div className="bg-white shadow-md border border-gray-200 rounded-lg max-w-sm w-[370px] min-h-[450px] flex flex-col relative ">
+
+              <div className='relative h-[200px] '>
+                <Image src={props.imageUrl} width='200' height='200' alt='blog image' className='object-cover object-center w-full z-1  h-48 ' />
+
+                <div className=' absolute top-0 right-0 z-2 bg-gray-200 m-2 p-1 rounded flex items-center justify-center font-semibold'> <MdLocationOn size={20} className='text-purple-600' /> {props.location}</div>
+              </div>
+
+
+              <div className="  px-2 flex flex-col flex-1 h-full">
+
+                <h5 className="text-gray-900 font-bold text-2xl tracking-tight mb-2 capitalize ">{props.title}</h5>
+
+                <p className="font-normal   text-gray-700 my-6  line-clamp-4 mb-auto">{shortDescription}</p>
+
+                <div className='flex justify-around items-center mb-2 gap-4'>
+
+                  <Link href={`/blogs/view/${props.id}`} className=" w-full text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm p-3 text-center   ">
+
+                    <div className='flex  items-center justify-center gap-1 text-center'>
+                      Read more
+                      <AiOutlineArrowRight size={18} />
+                    </div>
+                  </Link>
+
+
+
+                  {props.isProfile && <Link href={`blogs/edit/${props.id}`} className="w-full text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm p-3 text-center
+                  ">Edit</Link>
+                  }
+                </div>
+
+
+
+                {props.isProfile && <button
+                  //onClick={handleDelete}
+                  className=' absolute top-2 left-2 text-red-500 border  bg-white opacity-80 shadow-sm rounded-full p-2 hover:opacity-100 duration-500'><RiDeleteBin6Fill size={30} /></button>}
+
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      export default BlogItem
+
+```
+
+9. note if you login with social media and you have an image on your social media you will be able to see it in the Profile page
 
 # 11 Edit + Delete Functionality
 
+   
+
 # 12 Search Page Functionality
+
+   ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
+
+        ## Next Steps ----------------------------------------------- >>>
 
 # 13 Login + Signup pages
 

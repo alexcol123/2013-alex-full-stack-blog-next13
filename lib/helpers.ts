@@ -46,3 +46,13 @@ export const getAllCategories = async () => {
 
   return data.categories
 }
+
+export const getUserById = async (id: string) => {
+
+  console.log('id  user ', id)
+  const res = await fetch('http://localhost:3000/api/users/' + id, { cache: 'no-store' });
+
+  const data = await res.json()
+
+  return data
+}
