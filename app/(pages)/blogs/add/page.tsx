@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form"
 import { EditorState, convertToRaw } from "draft-js"
 import draftToHtml from 'draftjs-to-html'
 import { toast } from "react-hot-toast"
+import { useRouter } from "next/navigation"
 // import { getAllCategories } from "@/lib/helpers"
 
 
@@ -33,6 +34,8 @@ export const getAllCategories = async () => {
 
 
 const BlogAdd = () => {
+
+  const router = useRouter()
 
   // const catList1 = getAllCategories()
   // console.log("CATLIST1", catList1)
@@ -122,6 +125,8 @@ const BlogAdd = () => {
       })
 
       toast.success('Sending Completed 😺', { id: 'postData' })
+
+      router.push('/profile')
 
     } catch (error) {
       toast.error('Sending failed 😹', { id: 'postData' })

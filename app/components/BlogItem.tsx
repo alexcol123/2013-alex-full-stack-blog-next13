@@ -8,6 +8,7 @@ import { ReactDOM, } from 'react'
 import { AiOutlineArrowRight } from 'react-icons/ai'
 import { RiDeleteBin6Fill } from 'react-icons/ri';
 import { MdLocationOn } from 'react-icons/md'
+import { toast } from 'react-hot-toast'
 
 
 function getTextFromHtml(html: string) {
@@ -24,6 +25,22 @@ const BlogItem = (props: BlogItemTypes) => {
 
   let shortDescription = getTextFromHtml(props?.description)
 
+
+
+
+
+  const handleDelete = async () => {
+    toast.loading("Deleting Blog", { id: 'delete' })
+    try {
+      await props?.deleteBlog(props.id)
+
+      toast.success("Blog Deleted Successfully  ", { id: 'delete' })
+    } catch (error) {
+      console.log(error)
+      toast.error(" Deleting failed   ", { id: 'delete' })
+    }
+
+  }
 
 
 
@@ -67,7 +84,7 @@ const BlogItem = (props: BlogItemTypes) => {
 
 
           {props.isProfile && <button
-            //onClick={handleDelete}
+            onClick={handleDelete}
             className=' absolute top-2 left-2 text-red-500 border  bg-white opacity-80 shadow-sm rounded-full p-2 hover:opacity-100 duration-500'><RiDeleteBin6Fill size={30} /></button>}
 
         </div>

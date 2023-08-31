@@ -21,7 +21,10 @@ export const generateErrorMessage = (data: any, status: number) => {
 
 
 export const getAllBlogs = async (count?: number) => {
-  const res = await fetch('http://localhost:3000/api/blogs', { cache: 'no-store' });
+  const res = await fetch('http://localhost:3000/api/blogs',
+    // { cache: 'no-store' }
+    { next: { revalidate: 0 } }
+  );
   const data = await res.json()
 
 
@@ -32,7 +35,11 @@ export const getAllBlogs = async (count?: number) => {
 }
 
 export const getBlogById = async (id: string) => {
-  const res = await fetch(`http://localhost:3000/api/blogs/${id}`, { cache: 'no-store' })
+  const res = await fetch(`http://localhost:3000/api/blogs/${id}`,
+    // { cache: 'no-cache' }
+    { next: { revalidate: 2 } }
+
+  )
   const data = await res.json()
 
   return data.blog
@@ -50,7 +57,10 @@ export const getAllCategories = async () => {
 export const getUserById = async (id: string) => {
 
   console.log('id  user ', id)
-  const res = await fetch('http://localhost:3000/api/users/' + id, { cache: 'no-store' });
+  const res = await fetch('http://localhost:3000/api/users/' + id, 
+  // { cache: 'no-store' }
+  { next: { revalidate: 0 } }
+  );
 
   const data = await res.json()
 

@@ -1514,11 +1514,320 @@ code:
 
 # 11 Edit + Delete Functionality
 
-   
+1.  In blogs create a folder edit folder then / [id] / page.tsx component and export it as EditBlog,
+
+Note: must be client component
+
+2.  All we will be able to edit is the title and the blog content.
+
+3.  get params as we have done in the past
+    { params }: { params: { id: string } }
+
+4.  Copy in full the add blog page
+    Note: removed un-needed things
+    image, useform, getAllCategories, file input , location and category , imports image, useform hook,
+
+<!-- Voy ==================================================> -->
+
+5.  create func to get blogs by id
+
+const getBlogById = async (id: string) => {
+const res = await fetch('http://localhost:3000/api/blogs/' + id, { cache: 'no-store' });
+const data = await res.json()
+
+console.log(data)
+return data.blog
+} 6. Creta a loading state and set to false
+add Toaster , inside the section div
+
+    ```
+     <Toaster position="top-right" />
+    ```
+
+7.  create a useEffect func
+    useEffect(() => {
+
+    setIsLoading(true)
+    toast.loading('Updating Blog Details', { id: 'loading' })
+    getBlogById(params.id).then((data: BlogItemTypes) => {
+    const contentBlocks = convertFromHTML(data.description)
+    const contentState = ContentState.createFromBlockArray(contentBlocks.contentBlocks)
+
+        const initialState = EditorState.createWithContent(contentState)
+        setEditorState(initialState)
+
+        if (headingRef && headingRef.current) headingRef.current.innerText = data.title
+
+        setIsLoading(false)
+        toast.success('Blot Details Updated ', { id: 'loading' })
+
+    }).catch(err => {
+    console.log(err)
+    toast.success('Error Updating Blog ', { id: 'loading' })
+    }).finally(() => {
+
+        setIsLoading(false)
+
+    })
+    }, [])
+
+8.  full useEffect code
+
+              useEffect(() => {
+
+                setIsLoading(true)
+                toast.loading('Updating Blog Details', { id: 'loading' })
+
+                // Gets blog data
+                getBlogById(params.id)
+
+                  //  Converts conent so editor can show it
+                  .then((data: BlogItemTypes) => {
+                    const contentBlocks = convertFromHTML(data.description)
+                    const contentState = ContentState.createFromBlockArray(contentBlocks.contentBlocks)
+
+                    const initialState = EditorState.createWithContent(contentState)
+                    setEditorState(initialState)
+
+                    // shows title
+                    if (headingRef && headingRef.current) headingRef.current.innerText = data.title
+
+                    setIsLoading(false)
+                    toast.success('Blot Details Updated ', { id: 'loading' })
+
+
+                  }).catch(err => {
+                    console.log(err)
+                    toast.success('Error Updating Blog ', { id: 'loading' })
+                  }).finally(() => {
+
+                    setIsLoading(false)
+
+                  })
+              }, [])
+
+9.  Test it , you should be able to see the original content form the blog for the , title an the he Editor
+
+10. create updateBlogFunc
+
+        ```
+        const updateBlog = async (id: string, postData: any) => {
+          const res = await fetch('http://localhost:3000/api/blogs/' + id, {
+            cache: 'no-store',
+            method: "PUT", body: JSON.stringify({ ...postData })
+          },
+          );
+          const data = await res.json()
+
+          console.log(data)
+          return data.blog
+        }
+        ```
+
+11. Create a handlePost function to update blgo
+
+const handlePost = async () => {
+
+    console.log(headingRef.current?.innerText)
+    console.log(convertEditorDataToHTML())
+
+    const postData = { title: headingRef.current?.innerText, description: convertEditorDataToHTML() }
+    try {
+      toast.loading('Updating your Post ', { id: 'postData' })
+      await (updateBlog(params.id, postData))
+
+
+      toast.success('Update Completed 😺', { id: 'postData' })
+
+    } catch (error) {
+      toast.error('Update failed 😹', { id: 'postData' })
+      return console.log(error)
+    }
+
+}
+
+12. call the handlePost func when publish button is clicke on
+    onClick={handlePost}
+
+13. If you update a blog you should see it update it
+
+14. navigate to updatedd post
+
+import { useRouter } from 'next/navigation'
+
+const router = useRouter()
+
+router.push('/dashboard')
+
+15. once you in the blogs view page you might need to reload it to see update
+    due to caching issues with Next 13 - trying to find why since we are using cache no-store
+
+16. Delete Fuctionality
+    Go back to BlogItem component
+
+    Create funciton to delete a blog
+
+          const deleteBlog = async (id: string) => {
+          const res = await fetch('http://localhost:3000/api/blogs/' + id, {
+            cache: 'no-store',
+            method: "DELETE",
+          },
+          );
+          const data = await res.json()
+
+          console.log(data)
+          return data.blog
+
+    }
+
+17. Create a funciton to handleDelete on click of the delete button
+
+    const handleDelete = async () => {
+    toast.loading("Deleting Blog", { id: 'delete' })
+    try {
+    await deleteBlog(props.id)
+
+            toast.success("Blog Deleted Successfully  ", { id: 'delete' })
+          } catch (error) {
+            console.log(error)
+            toast.error(" Deleting failed   ", { id: 'delete' })
+          }
+
+    }
+
+18. You should be able to delete a blog now
+
+Note: notice after delete you can still see page you need to refresh page, working on solution
+
+19. try to conver the Profile to client to see if blogs can be updated on delete
+
+20. converted the Profile page to Client , so that when we add or delete a blog , it reflects automatically
+
+    'use client'
+
+    import Image from 'next/image'
+    import { useCallback, useEffect, useState } from 'react'
+    import { MdAttachEmail } from 'react-icons/md'
+    import UserIcon from '@/public/userIcon.png'
+
+    import BlogItem from '../../components/BlogItem'
+    import { BlogItemTypes, UserItemType } from '@/lib/types'
+
+    import { authOptions } from '../../api/auth/[...nextauth]/route'
+    import { useSession } from 'next-auth/react'
+
+    const Profile = () => {
+
+        const [currentUserData, setCurrentUserData] = useState(null)
+
+
+
+
+
+        const { data: session } = useSession()
+        // console.log(session.user)
+
+        // const sessionData = await getServerSession(authOptions)
+
+        // const userData = await getUserById(sessionData?.user?.id)
+        // console.log(userData.blog)
+
+
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const deleteBlog = (async (id: string) => {
+          const res = await fetch('http://localhost:3000/api/blogs/' + id, {
+            cache: 'no-store',
+            method: "DELETE",
+          },
+          );
+          const data = await res.json()
+
+          console.log(data)
+          return data.blog
+        }
+        )
+
+        const getUserDataById = async (id: string) => {
+
+          const res = await fetch('http://localhost:3000/api/users/' + id,
+            { cache: 'no-store' }
+            // { next: { revalidate: 0 } }
+          );
+
+          const data = await res.json()
+
+          setCurrentUserData(data)
+        }
+
+
+        console.log(currentUserData)
+
+        useEffect(() => {
+          if (session && session.user) {
+            getUserDataById(session.user.id)
+
+          }
+        }, [session, deleteBlog])
+
+
+        return (
+
+          <section className='w-full h-full flex flex-col '>
+            <div>
+              <Image src={session?.user.image ?? UserIcon} alt='UserProfile ' width={200} height={200} className='h-20 w-20 object-cover mx-auto my-8 rounded-full bg-gray-50 border-4 border-purple-400 ' />
+            </div>
+            <div className=" mx-auto my-2">
+              <h1 className="text-4xl font-semibold  w-fit  rounded-md capitalize">
+                {session?.user.name}
+              </h1>
+            </div>
+
+            <div className=" mx-auto my-2">
+              <h1 className="text-xl font-semibold  flex items-center   w-fit gap-1">
+                <span> <MdAttachEmail /> </span>             {session?.user.email}
+              </h1>
+            </div>
+
+            {currentUserData &&
+              <div className="w-full h-full flex flex-col">
+                <div className='w-2/4 mx-auto'>
+                  <p className='text-center font-semibold text-xl  text-gray-50 bg-gray-400 border shadow-lg w-fit mx-auto rounded-md px-2'>🌟 Blogs Count: {currentUserData?._count?.blogs} </p>
+
+                </div>
+
+                <div className="  bg-red-100 flex flex-wrap justy-center p-4 my-3 gap-8">
+
+                  {currentUserData?.blogs?.map((blog: BlogItemTypes) => <BlogItem key={blog.id} {...blog} isProfile={true} deleteBlog={deleteBlog} />)}
+
+                </div>
+
+              </div>
+
+            }
+
+
+            {/* {JSON.stringify(userData.Blogs)} */}
+          </section >
+        )
+
+    }
+
+    export default Profile
+
+Note: that we moved the deleteBlog function form the BlogItem, to the profile so that we can add as a dependency on the useEffect, so that on Delete , we can grab the blogs again and show the most up to date informaiton
+
+21. Also on the Blogs / add page , we made it so that once a blog its created we are pushed to the Profile page, to show the newly added blog as part of our list of blogs
+
+Note we used: router.push('/profile')
+
+We did the same on the blogs/ edit page so that upon edit we are redirected to the Profile page to see the new post updated.
+
+22. Now we are able to edit, delete and create blogs, and upon ay of those actions the info is reflected in real time
 
 # 12 Search Page Functionality
 
-   ## Next Steps ----------------------------------------------- >>>
+## Next Steps ----------------------------------------------- >>>
 
         ## Next Steps ----------------------------------------------- >>>
 

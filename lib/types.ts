@@ -1,3 +1,4 @@
+import { FunctionBody } from "typescript";
 
 export type BlogItemTypes = {
   id: string,
@@ -9,7 +10,10 @@ export type BlogItemTypes = {
   updatedDate: string;
   categoryId: string;
   location: string;
-  isProfile?: boolean
+  isProfile?: boolean;
+  deleteBlog: (id:string)=> void
+    
+  
 }
 
 
@@ -17,7 +21,7 @@ export type UserItemType = {
   id: string,
   name: string;
   email: string;
-  Blogs: BlogItemTypes[];
-  _count: { Blogs: number };
+  blogs: BlogItemTypes[];
+  _count: { blogs: number };
   message: string
 }
