@@ -129,13 +129,15 @@ export const authOptions = {
   },
 
 
-  // pages: {
-  //   signIn: '/login',
-  //   // signOut: '/',
-  //   // error: '/auth/error', // Error code passed in query string as ?error=
-  //   // verifyRequest: '/auth/verify-request', // (used for check email message)
-  //   // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
-  // }
+  pages: {
+    signIn: '/login',
+
+    // Other sample pages , if we had signout pages or error  (not needed for this project)
+    // signOut: '/',
+    // error: '/auth/error', // Error code passed in query string as ?error=
+    // verifyRequest: '/auth/verify-request', // (used for check email message)
+    // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+  }
 }
 
 const handler = NextAuth(authOptions)
