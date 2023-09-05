@@ -2260,12 +2260,50 @@ export default Register
 
 # 15 Optimization
 
+1. protecting routes
+   we will create a middleware to redirect if user is not authorized to access some pages
+
+2. Before adding code bellow try login out then try to go to http://localhost:3000/blogs/add route and you shuld be able to do so.
+
+Note : we are triying to prevent acess to /blog/add , /blog/edit and /profile,  
+for this wi will create the middleware below that will run before a req is made, to verify if user is logged in.
+
+3. create a file and call it middleware.ts
+
+   ```
+   import { getToken } from "next-auth/jwt";
+   import { NextRequest, NextResponse } from "next/server";
+
+   export async function middleware(req: NextRequest) {
+
+     const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+
+     console.log(session)
+
+     if (!session) {
+       return NextResponse.redirect(new URL('/blogs', req.url))
+     }
+
+     return NextResponse.next()
+   }
+
+   export const config = {
+     matcher: ["/blogs/add", "/blogs/edit/:path*", "/profile"],
+   }
+   ```
+
+4. now try going to http://localhost:3000/blogs/add as we did on STEP 2 , and now you should not be able to , and you should be redirected to the Blogs page thanks to our middleware
+
+# 16 add pagination
+
 ## Next Steps ----------------------------------------------- >>>
 
         ## Next Steps ----------------------------------------------- >>>
 
         ## Next Steps ----------------------------------------------- >>>
 
-# 16 add pagination
-
 # 17 add filter by
+
+# 18 responsive nav
+
+# 19 Add AI Generation
