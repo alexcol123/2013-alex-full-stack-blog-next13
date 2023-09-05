@@ -5,7 +5,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import GithubProvider from 'next-auth/providers/github'
 import prisma from '@/prisma'
 import bcrypt from 'bcrypt'
-import { connectToDb, } from '@/lib/helpers'
+import { connectToDb, verifyUsrDetailsAtLogin, } from '@/lib/helpers'
 
 
 export const authOptions = {
@@ -65,10 +65,12 @@ export const authOptions = {
             throw new Error('Incorrect password')
           }
 
-
+          //    console.log(user)
 
           // return user
           return user
+
+
 
 
         } catch (error) {
@@ -87,10 +89,42 @@ export const authOptions = {
       if (session.user && token.sub) {
         session.user.id = token.sub;
       }
+
+      //   console.log('session ====================')
+
+      //    console.log(session)
+
+
+      //  console.log('token ====================')
+
+      //    console.log(token)
+
+
       return session
     },
 
+    async signIn({ account, user, profile }) {
 
+      // If social login 
+      if (account.provider === 'github' || account.provider === 'google') {
+
+
+
+        const newUser = await verifyUsrDetailsAtLogin(user)
+
+        if (typeof newUser !== null) {
+          user.id = newUser?.id
+
+          if (profile && profile.sub) {
+            profile.sub = newUser?.id
+          }
+        }
+
+      }
+
+      // if not social login skip 
+      return true
+    },
 
   },
 

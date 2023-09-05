@@ -60,14 +60,14 @@ const Profile = () => {
   }
 
 
-  console.log(currentUserData)
+
 
   useEffect(() => {
     if (session && session.user) {
       getUserDataById(session.user.id)
 
     }
-  }, [session, deleteBlog])
+  }, [])
 
 
   return (
@@ -91,7 +91,7 @@ const Profile = () => {
       {currentUserData &&
         <div className="w-full h-full flex flex-col">
           <div className='w-2/4 mx-auto'>
-            <p className='text-center font-semibold text-xl  text-gray-50 bg-gray-400 border shadow-lg w-fit mx-auto rounded-md px-2'>🌟 Blogs Count: {currentUserData?._count?.blogs} </p>
+            <p className='text-center font-semibold text-xl  text-gray-50 bg-gray-400 border shadow-lg w-fit mx-auto rounded-md px-2'>🌟 Blogs Count: {currentUserData?._count?.blogs || 0} </p>
 
           </div>
 

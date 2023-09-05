@@ -1919,7 +1919,94 @@ We did the same on the blogs/ edit page so that upon edit we are redirected to t
 
 export default SearchPage
 
-# 13 Login + Signup pages
+# 13 Customizing Next-Auth
+
+we will customize next-auth so that when we sign in with socila media , we save the new user in our Database ,
+
+1.  provide client Id and client secret from github and google, then add them to .env file
+
+2.  add them to api / auth / route.ts
+
+    sample
+
+    ```
+     GithubProvider({
+       clientId: process.env.GITHUB_CLIENT_ID as string,
+       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+     }),
+     GoogleProvider({
+       clientId: process.env.GOOGLE_CLIENT_ID as string,
+       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+     }),
+
+    ```
+
+3.  try to login , use a diferent email from the ones you register in github or google for the api keys
+
+4.  test it should be able to login in http://localhost:3000/api/auth/signin
+
+5.  add logout button to navbar
+
+```
+          {status === 'authenticated' && <button className='bg-violet-500 px-2 rounded text-slate-100 hover:bg-violet-700 font-semibold shadow' onClick={() => signOut({ callbackUrl: 'http://localhost:3000/login' })} >Logout</button>}
+
+```
+
+6.  If user signin with github or google , we need to add him/her to our database
+
+In Helpers we will create this function to create an user if the doesnt exits in our DB
+
+Note code bellow create a new user if one doesnt exist after someone logins with social media accounts
+
+```
+export const verifyUsrDetailsAtLogin = async (user: DefaultUser) => {
+  await connectToDb();
+
+  const userExistsInDB = await prisma.user.findFirst({ where: { email: user.email as string } })
+
+  if (userExistsInDB) return userExistsInDB
+
+  else {
+    const newUser = await prisma.user.create({ data: { email: user.email as string, name: user.name as string } })
+
+    return newUser
+
+  }
+}
+```
+
+7.  Then If user signin with github or google , we need to add him/her to udr database we will create a callback in api / auth / route
+
+Note after the user signs in with github or google , we dont know if user is in our DB so we need to check with
+
+```
+
+    async signIn({ account, user, profile }) {
+
+
+      if (account.provider === 'github' || account.provider === 'google') {
+
+        const newUser = await verifyUsrDetailsAtLogin(user)
+
+        if (typeof newUser !== null) {
+          user.id = newUser?.id
+
+          if (profile && profile.sub) {
+            profile.sub = newUser?.id
+          }
+        }
+
+      }
+      return true
+    },
+
+```
+
+8. try to login with social media , you should be able to do it , also if you check your DB your new user (that sign in with social media ) should be there
+
+# 14 Desing custom login and signup pages
+
+# 15 Optimization
 
 ## Next Steps ----------------------------------------------- >>>
 
@@ -1927,8 +2014,6 @@ export default SearchPage
 
         ## Next Steps ----------------------------------------------- >>>
 
-# 14 Optimization
+# 16 add pagination
 
-# 15 add pagination
-
-# 16 add filter by
+# 17 add filter by
